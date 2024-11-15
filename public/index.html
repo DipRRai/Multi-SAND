@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="backboard">
 
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
@@ -10,24 +10,22 @@
 
 <body>
   <main>
+    <h1 id="spin_text">Spin that CAT!</h1>
     <script src="/socket.io/socket.io.js"></script>
     <script src="
     https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js
     "></script>
-    integrity="sha512-qtX0GLM3qX8rxJN1gyDfcnMFFrKvixfoEOwbBib9VafR5vbChV5LeE5wSI/x+IlCkTY5ZFddFDCCfaVJJNnuKQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <div class="interactable">
+      <img src="sadcat.png" alt="sadcat" class="cat_spinner" width="200" height="200">
       <div id="canvas"></div>
-      <div>
-        <div class="color-pallete">
-          <div class="color" id="color_red"></div>
-          <div class="color" id="color_pink"></div>
-        </div>
-      </div>
-      <script src="sketch.js"></script>
+      <img src="sadcat.png" alt="sadcat" class="cat_spinner" width="200" height="200">
+    </div>
+    <div class="title">
+      <div id="display">00:00:00:00</div>
     </div>
   </main>
   <script src="index.js"></script>
+  <script src="sketch.js"></script>
 </body>
 
 </html>

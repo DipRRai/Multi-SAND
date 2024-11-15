@@ -1,16 +1,104 @@
 const socket = io();
+const backboard = document.getElementById('backboard');
+const cat_gifs = document.getElementsByClassName('cat_spinner');
+const display = document.getElementById('display')
+console.log(display);
+var audio = new Audio('audioremix.mp3');
 
-// var string = "This is my compression test.";
-// console.log("Size of sample is: " + string.length);
-// var compressed = LZString.compress(string);
-// console.log("Size of compressed sample is: " + compressed.length);
-// string = LZString.decompress(compressed);
-// console.log("Sample is: " + string);
 
 socket.on('init', (data) => {
     grid = decomp(data);
-    console.log(grid);
+    //console.log(grid);
 });
+let rainbowInterval = null; // Initialize interval as null to track active status
+
+let timer = null;
+let startTime = 0;
+let elapsedTime = 0;
+let isRunning = false;
+
+function start(){
+    if (!isRunning) {
+        startTime = Date.now() - elapsedTime;
+        timer = setInterval(update, 10);
+        isRunning = true;
+    }
+}
+
+function update(){
+    const currentTime = Date.now();
+    elapsedTime = currentTime - startTime;
+    let hours = Math.floor(elapsedTime / (1000 * 60 * 60 ))
+    let minutes = Math.floor(elapsedTime / (1000 * 60) % 60)
+    let seconds = Math.floor(elapsedTime / (1000) % 60)
+    let milliseconds = Math.floor( elapsedTime % 1000 / 10 );
+
+    hours = String(hours).padStart(2, "0");
+    minutes = String(minutes).padStart(2, "0");
+    seconds = String(seconds).padStart(2, "0");
+    milliseconds = String(milliseconds).padStart(2, "0");
+
+    display.textContent = `${hours}:${minutes}:${seconds}:${milliseconds}`
+}
+
+function stop(){
+    if (isRunning){
+        clearInterval(timer);
+        elapsedTime = Date.now() - startTime;
+        isRunning = false;
+    }
+}
+
+function reset() {
+    clearInterval(timer);
+    startTime = 0;
+    elapsedTime = 0;
+    isRunning = false;
+    display.textContent = "00:00:00:00"; 
+}
+
+socket.on('RAINBOW', (data) => {
+    if (data === true) {
+        if (audio.paused) {
+            audio.play().catch((error) => {
+                console.error('Audio play failed:', error);
+            });
+        }
+        for (let gif of cat_gifs) {
+            const currentSrc = gif.src.split('/').pop();
+            if (currentSrc  !== 'spincat.gif'){
+                if (display.textContent == "00:00:00:00") {
+                    start();
+                } else {
+                    reset();
+                    start();
+                }
+                gif.src = 'spincat.gif';
+            }
+        }
+        if (!rainbowInterval) { // Only start a new interval if none exists
+            let hue = 0;
+            rainbowInterval = setInterval(() => {
+                backboard.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+                hue = (hue + 5) % 360;
+            }, 100); // Change color every 100ms
+        }
+    } else {
+        audio.pause();
+        audio.currentTime = 0;
+        for (let gif of cat_gifs) {
+            const currentSrc = gif.src.split('/').pop();
+            if (currentSrc !== 'sadcat.png'){
+                stop();
+                gif.src = 'sadcat.png';
+            }
+        }
+        clearInterval(rainbowInterval); // Stop the rainbow effect
+        rainbowInterval = null; // Reset interval tracker
+        backboard.style.backgroundColor = 'black';
+    }
+});
+
 
 function decomp(data){
     temp = LZString.decompress(data);
