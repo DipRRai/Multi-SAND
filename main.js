@@ -6,7 +6,7 @@ const PORT = 3000;
 const server = app.listen(PORT, () => console.log('server started'));
 const io = require("socket.io")(server);
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'docs')));
 
 const ROWS = 40;
 const COLS = 40;
